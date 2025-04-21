@@ -1,0 +1,64 @@
+import jakarta.servlet.http.*;
+import jakarta.servlet.*;
+import java.io.*; 
+import java.sql.*;
+
+public class DemoServlet extends HttpServlet {
+    public void doGet(HttpServletRequest req, HttpServletResponse res)
+        throws ServletException, IOException {
+
+        // Set content type for response
+        res.setContentType("text/html");
+        PrintWriter pw = res.getWriter();  // Get the stream to write the data
+
+        // Write the response in HTML format
+        pw.println("<html><body>");
+        pw.println("<h2>Welcome to Sanjivani eBookShop</h2>");
+        pw.println("<table border='1' cellpadding='5' cellspacing='0'>");
+        pw.println("<tr><th>Book ID</th><th>Book Title</th><th>Quantity</th><th>Book Price</th><th>Book Author</th></tr>");
+
+        try {
+            // Load the JDBC driver (Make sure the MySQL connector is included in your project)
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Connect to the MySQL database 'sanjivani'
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/sanjivani", "root", "");
+
+            // Create a statement to execute SQL queries
+            Statement stmt = con.createStatement();
+
+            // Execute the SQL query to retrieve all books
+            ResultSet rs = stmt.executeQuery("SELECT * FROM ebookshop");
+
+            // Loop through the ResultSet and display the data in a table
+            while (rs.next()) {
+                // Retrieve data from the ResultSet
+                int id = rs.getInt("id");  // Book ID
+                String title = rs.getString("title");  // Book Title
+                int qty = rs.getInt("qty");  // Quantity
+                double price = rs.getDouble("price");  // Book Price
+                String author = rs.getString("author_name");  // Book Author
+
+                // Display the data in an HTML table row
+                pw.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + qty + "</td><td>" + price + "</td><td>" + author + "</td></tr>");
+            }
+
+            // Close the ResultSet, Statement, and Connection objects
+            rs.close();
+            stmt.close();
+            con.close();
+
+        } catch (ClassNotFoundException e) {
+            pw.print("<p>Error: MySQL Driver not found. " + e.getMessage() + "</p>");
+        } catch (SQLException e) {
+            pw.print("<p>Error: Database connection or SQL error. " + e.getMessage() + "</p>");
+        } catch (Exception e) {
+            pw.print("<p>General Error: " + e.getMessage() + "</p>");
+        }
+
+        // Close the HTML tags and the response stream
+        pw.println("</table>");
+        pw.println("</body></html>");
+        pw.close();  // Close the PrintWriter stream
+    }
+}
