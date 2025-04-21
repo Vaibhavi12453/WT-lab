@@ -1,0 +1,43 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class DemoServlet extends HttpServlet {
+   public DemoServlet() {
+   }
+
+   public void doGet(HttpServletRequest var1, HttpServletResponse var2) throws ServletException, IOException {
+      var2.setContentType("text/html");
+      PrintWriter var3 = var2.getWriter();
+      var3.println("<html><body>");
+      var3.println("Welcome to Pragati eBookShop");
+      var3.println("<table border='5'>");
+      var3.println("<tr><th>Book id</th><th>Book Title</th><th>Book Author</th><th>Book Price</th><th>Quantity</th></tr>");
+
+      try {
+         Class.forName("com.mysql.jdbc.Driver");
+         Connection var4 = DriverManager.getConnection("jdbc:mysql://localhost:3306/pragati", "root", "");
+         Statement var5 = var4.createStatement();
+         ResultSet var6 = var5.executeQuery("select * from ebookshop");
+
+         while(var6.next()) {
+            String var10001 = var6.getObject(1).toString();
+            var3.println("<tr><td>" + var10001 + "</td><td>" + var6.getString(2) + "</td><td>" + var6.getString(3) + "</td><td>" + var6.getDouble(4) + "</td><td>" + var6.getInt(5) + "</td></tr>");
+         }
+      } catch (Exception var7) {
+         var3.print(var7);
+      }
+
+      var3.println("</table>");
+      var3.println("</body></html>");
+      var3.close();
+   }
+}
